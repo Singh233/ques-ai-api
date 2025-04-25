@@ -8,6 +8,7 @@ const envVarsSchema = Joi.object()
     NODE_ENV: Joi.string().valid('production', 'development', 'test').required(),
     PORT: Joi.number().default(8000),
     MONGODB_URL: Joi.string().required().description('Mongo DB url'),
+    REDIS_URL: Joi.string().required().description('Redis url'),
     FRONTEND_URL: Joi.string().required().description('Frontend url'),
     CORS_ALLOWED: Joi.string().required().description('CORS allowed origins'),
   })
@@ -25,6 +26,10 @@ module.exports = {
   frontend_url: envVars.FRONTEND_URL,
   mongoose: {
     url: envVars.MONGODB_URL,
+    options: {},
+  },
+  redis: {
+    url: envVars.REDIS_URL,
     options: {},
   },
   cors: {

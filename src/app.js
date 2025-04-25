@@ -10,6 +10,7 @@ const routes = require('./routes/index.js');
 const { errorConverter, errorHandler } = require('./middlewares/error.js');
 const ApiError = require('./utils/ApiError.js');
 const app = express();
+require('./config/redis.js');
 
 app.use(morgan);
 

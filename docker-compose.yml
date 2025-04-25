@@ -25,8 +25,21 @@ services:
     networks:
       - node-network
 
+  redis:
+    image: redis:7-alpine
+    container_name: quest-ai-redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data/redis
+    restart: unless-stopped
+    command: redis-server --save 60 1 --loglevel warning
+    networks:
+      - node-network
+
 volumes:
   dbdata:
+  redis_data:
 
 networks:
   node-network:
