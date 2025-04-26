@@ -2,7 +2,7 @@ const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
 const config = require('./config.js');
 const { tokenTypes } = require('./tokens.js');
 const { User } = require('../models/index.js');
-const { getCacheByKey, setCacheByKey, CACHE_KEYS } = require('./config/redis.js');
+const { getCacheByKey, setCacheByKey, CACHE_KEYS } = require('./redis.js');
 
 const jwtOptions = {
   secretOrKey: config.jwt.secret,
