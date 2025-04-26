@@ -36,7 +36,7 @@ module.exports = {
     options: {},
   },
   cors: {
-    allowedOrigins: envVars.CORS_ALLOWED,
+    allowedOrigins: envVars.CORS_ALLOWED.split(',').map((origin) => origin.trim()),
   },
   jwt: {
     secret: envVars.JWT_SECRET,
