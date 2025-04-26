@@ -31,16 +31,6 @@ const searchUsers = {
   }),
 };
 
-const createUser = {
-  body: Joi.object().keys({
-    name: Joi.string().required(),
-    email: Joi.string().required(),
-    type: Joi.string()
-      .valid(...Object.values(Types))
-      .required(),
-  }),
-};
-
 const updateUser = {
   params: Joi.object().keys({
     id: Joi.required().custom(objectId),
@@ -72,7 +62,6 @@ module.exports = {
   getUsers,
   getUser,
   searchUsers,
-  createUser,
   updateUser,
   changeType,
   deleteUser,

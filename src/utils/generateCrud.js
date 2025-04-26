@@ -1,6 +1,6 @@
-import catchAsync from './catchAsync.js';
-import ApiError from './ApiError.js';
-import httpStatus from 'http-status';
+const catchAsync = require('./catchAsync.js');
+const ApiError = require('./ApiError.js');
+const httpStatus = require('http-status');
 
 const generateCrud = (Model, options = {}) => {
   const { name = '', searchableFields = '', populate = '', functions = [] } = options;
@@ -107,4 +107,4 @@ const generateCrud = (Model, options = {}) => {
   return handlers;
 };
 
-export default generateCrud;
+module.exports = generateCrud;
