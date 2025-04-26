@@ -75,25 +75,32 @@ const signUpUser = async (userData) => {
 };
 
 const signInUser = async (email, password) => {
+  // Find the email document
   const emailDoc = await Email.findOne({ address: email });
+  if (!emailDoc) {
+    throw new ApiError(401, 'Invalid email or password');
+  }
+
+  // Find the user associated with the email
   const user = await User.findOne({ email: emailDoc._id }).select('+password');
   if (!user) {
     throw new ApiError(401, 'Invalid email or password');
   }
 
+  // Verify the password
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
     throw new ApiError(401, 'Invalid email or password');
   }
 
-  // Remove password from the user object before returning
+  // Remove sensitive information before returning
   user.password = undefined;
 
   return user;
 };
 
-const getMe = async (userId) => {
-  const user = await User.findById(userId).populate('email', 'address');
+const getMe = async (rUser) => {
+  const user = await User.findById(rUser.id).populate('email', 'address');
   if (!user) {
     throw new ApiError(404, 'User not found');
   }

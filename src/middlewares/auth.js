@@ -1,5 +1,7 @@
 const passport = require('passport');
 const httpStatus = require('http-status');
+const moment = require('moment');
+
 const ApiError = require('../utils/ApiError.js');
 const jwt = require('jsonwebtoken');
 const config = require('../config/config.js');
@@ -77,6 +79,12 @@ const auth = () => async (req, res, next) => {
         // Set new tokens in response headers
         res.set('Access-Token', tokens.access);
         res.set('Refresh-Token', tokens.refresh);
+
+        const accessTokenExpires = moment().add(config.jwt.accessExpirationMinutes, 'minutes');
+        const refreshTokenExpires = moment().add(config.jwt.refreshExpirationDays, 'days');
+
+        res.set('Access-Token-Expires', accessTokenExpires.unix());
+        res.set('Refresh-Token-Expires', refreshTokenExpires.unix());
 
         if (req.cookies?.refreshToken) {
           res.cookie('accessToken', tokens.access, {

@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const { objectId } = require('./custom.validation.js');
+const { objectId, password } = require('./custom.validation.js');
 const { Types } = require('../config/accessControl.js');
 
 const getUsers = {
@@ -63,7 +63,7 @@ const signUpUser = {
     .keys({
       name: Joi.string().required(),
       email: Joi.string().email().required(),
-      password: Joi.string().required(),
+      password: Joi.string().custom(password).required(),
       type: Joi.string().valid(...Object.values(Types)),
     })
     .min(1),
