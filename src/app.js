@@ -11,6 +11,8 @@ const { errorConverter, errorHandler } = require('./middlewares/error.js');
 const ApiError = require('./utils/ApiError.js');
 const app = express();
 require('./config/redis.js');
+const passport = require('passport');
+const { jwtStrategy } = require('./config/passport.js');
 
 app.use(morgan);
 
@@ -38,6 +40,10 @@ app.use(
 );
 
 app.options('*', cors());
+
+// jwt authentication
+app.use(passport.initialize());
+passport.use('jwt', jwtStrategy);
 
 app.use('/v1', routes);
 
