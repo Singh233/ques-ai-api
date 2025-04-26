@@ -3,6 +3,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const compression = require('compression');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const httpStatus = require('http-status');
 const morgan = require('./config/morgan.js');
 const config = require('./config/config.js');
@@ -24,6 +25,9 @@ app.use(express.json());
 
 // parse urlencoded request body
 app.use(express.urlencoded({ extended: true }));
+
+// parse cookies
+app.use(cookieParser());
 
 // sanitize request data
 app.use(mongoSanitize());

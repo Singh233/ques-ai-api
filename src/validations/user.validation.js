@@ -58,6 +58,26 @@ const deleteUser = {
   }),
 };
 
+const signUpUser = {
+  body: Joi.object()
+    .keys({
+      name: Joi.string().required(),
+      email: Joi.string().email().required(),
+      password: Joi.string().required(),
+      type: Joi.string().valid(...Object.values(Types)),
+    })
+    .min(1),
+};
+
+const signInUser = {
+  body: Joi.object()
+    .keys({
+      email: Joi.string().email().required(),
+      password: Joi.string().required(),
+    })
+    .min(1),
+};
+
 module.exports = {
   getUsers,
   getUser,
@@ -65,4 +85,6 @@ module.exports = {
   updateUser,
   changeType,
   deleteUser,
+  signUpUser,
+  signInUser,
 };
