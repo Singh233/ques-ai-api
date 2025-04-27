@@ -20,6 +20,8 @@ out/
 .env.test.local
 .env.production.local
 
+.secrets
+
 # Generated files
 *.tsbuildinfo
 
