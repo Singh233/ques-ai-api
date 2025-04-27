@@ -77,8 +77,8 @@ const auth = () => async (req, res, next) => {
         const tokens = await authService.refreshAuth(refreshToken);
 
         // Set new tokens in response headers
-        res.set('Access-Token', tokens.access);
-        res.set('Refresh-Token', tokens.refresh);
+        res.set('Access-Token', tokens.access.token);
+        res.set('Refresh-Token', tokens.refresh.token);
 
         const accessTokenExpires = moment().add(config.jwt.accessExpirationMinutes, 'minutes');
         const refreshTokenExpires = moment().add(config.jwt.refreshExpirationDays, 'days');
@@ -87,14 +87,14 @@ const auth = () => async (req, res, next) => {
         res.set('Refresh-Token-Expires', refreshTokenExpires.unix());
 
         if (req.cookies?.refreshToken) {
-          res.cookie('accessToken', tokens.access, {
+          res.cookie('accessToken', tokens.access.token, {
             httpOnly: true,
             secure: config.env === 'production',
             sameSite: 'strict',
             maxAge: config.jwt.accessExpirationMinutes * 60 * 1000,
           });
 
-          res.cookie('refreshToken', tokens.refresh, {
+          res.cookie('refreshToken', tokens.refresh.token, {
             httpOnly: true,
             secure: config.env === 'production',
             sameSite: 'strict',
@@ -103,7 +103,7 @@ const auth = () => async (req, res, next) => {
         }
 
         // Add the newly refreshed token to the request for authentication
-        req.headers.authorization = `Bearer ${tokens.access}`;
+        req.headers.authorization = `Bearer ${tokens.access.token}`;
       } catch (refreshError) {
         logger.error(`Token refresh failed: ${JSON.stringify(refreshError)}`);
         throw new ApiError(httpStatus.UNAUTHORIZED, 'Failed to refresh authentication token');

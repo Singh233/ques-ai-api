@@ -9,7 +9,7 @@ const cache = (group, expiry = 3600) => {
       return next();
     }
 
-    const key = `cache:${group}:${req.originalUrl}`;
+    const key = req.user ? `cache:${group}:${req.user.id}:${req.originalUrl}` : `cache:${group}:${req.originalUrl}`;
 
     if (req.method === 'GET') {
       const data = await client.get(key);
@@ -39,6 +39,23 @@ const cache = (group, expiry = 3600) => {
   });
 };
 
+const deleteCacheByKey = (group) =>
+  catchAsync(async (req, res, next) => {
+    if (!isReady()) {
+      return res.status(httpStatus.NO_CONTENT).json({ message: 'Cache is not ready' });
+    }
+    if (!group) {
+      return res.status(httpStatus.BAD_REQUEST).json({ message: 'Key parameter is required' });
+    }
+
+    let key = req.user ? `cache:${group}:${req.user.id}:*` : `cache:${group}:*`;
+
+    const keys = await client.keys(key);
+    await Promise.all(keys.map((key) => client.del(key)));
+
+    next();
+  });
+
 const clearCache = catchAsync(async (req, res) => {
   if (!isReady()) {
     return res.status(httpStatus.NO_CONTENT).json({ message: 'Cache is not ready' });
@@ -56,4 +73,4 @@ const clearCache = catchAsync(async (req, res) => {
   return res.status(httpStatus.NO_CONTENT).json({ message: 'Cache cleared' });
 });
 
-module.exports = { cache, clearCache };
+module.exports = { cache, clearCache, deleteCacheByKey };
