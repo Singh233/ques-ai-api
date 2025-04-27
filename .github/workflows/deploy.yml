@@ -51,7 +51,7 @@ jobs:
           log "Starting deployment process..."
 
           # Navigate to the project directory
-          PROJECT_DIR="/home/flowcerycom/ques-ai-api"
+          PROJECT_DIR="/root/ques-ai-api"
           cd $PROJECT_DIR
 
           log "Pulling latest changes from repository..."
