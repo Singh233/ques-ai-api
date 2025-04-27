@@ -3,6 +3,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const compression = require('compression');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const httpStatus = require('http-status');
 const morgan = require('./config/morgan.js');
 const config = require('./config/config.js');
@@ -11,6 +12,8 @@ const { errorConverter, errorHandler } = require('./middlewares/error.js');
 const ApiError = require('./utils/ApiError.js');
 const app = express();
 require('./config/redis.js');
+const passport = require('passport');
+const { jwtStrategy } = require('./config/passport.js');
 
 app.use(morgan);
 
@@ -22,6 +25,9 @@ app.use(express.json());
 
 // parse urlencoded request body
 app.use(express.urlencoded({ extended: true }));
+
+// parse cookies
+app.use(cookieParser());
 
 // sanitize request data
 app.use(mongoSanitize());
@@ -38,6 +44,10 @@ app.use(
 );
 
 app.options('*', cors());
+
+// jwt authentication
+app.use(passport.initialize());
+passport.use('jwt', jwtStrategy);
 
 app.use('/v1', routes);
 

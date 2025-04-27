@@ -11,6 +11,9 @@ const envVarsSchema = Joi.object()
     REDIS_URL: Joi.string().required().description('Redis url'),
     FRONTEND_URL: Joi.string().required().description('Frontend url'),
     CORS_ALLOWED: Joi.string().required().description('CORS allowed origins'),
+    JWT_SECRET: Joi.string().required().description('JWT secret key'),
+    JWT_ACCESS_EXPIRATION_MINUTES: Joi.number().default(30).description('minutes after which access tokens expire'),
+    JWT_REFRESH_EXPIRATION_DAYS: Joi.number().default(30).description('days after which refresh tokens expire'),
   })
   .unknown();
 
@@ -33,6 +36,11 @@ module.exports = {
     options: {},
   },
   cors: {
-    allowedOrigins: envVars.CORS_ALLOWED,
+    allowedOrigins: envVars.CORS_ALLOWED.split(',').map((origin) => origin.trim()),
+  },
+  jwt: {
+    secret: envVars.JWT_SECRET,
+    accessExpirationMinutes: envVars.JWT_ACCESS_EXPIRATION_MINUTES,
+    refreshExpirationDays: envVars.JWT_REFRESH_EXPIRATION_DAYS,
   },
 };
