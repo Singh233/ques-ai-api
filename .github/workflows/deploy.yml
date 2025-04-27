@@ -60,14 +60,14 @@ jobs:
           npm install
 
           # Check for running containers
-          if sudo docker compose ps | grep -q "node-app"; then
+          if docker compose ps | grep -q "node-app"; then
             log "Stopping existing containers..."
-            sudo docker compose down
+            docker compose down
           fi
 
           # Start the containers with --build flag
           log "Starting containers..."
-          sudo docker compose up -d --build
+          docker compose up -d --build
 
           # Wait for the API to become healthy
           log "Waiting for API to become healthy..."
@@ -79,9 +79,9 @@ jobs:
             log "Health check attempt ${ATTEMPT}/${MAX_ATTEMPTS}"
             
             # Check if container is running
-            if ! sudo docker compose ps | grep -q "ques-api-node-app.*Up"; then
+            if ! docker compose ps | grep -q "ques-ai-api-node-app.*Up"; then
               log "Error: API container is not running"
-              sudo docker compose logs node-app
+              docker compose logs node-app
               exit 1
             fi
             
@@ -98,13 +98,13 @@ jobs:
 
           if [ $ATTEMPT -gt $MAX_ATTEMPTS ]; then
             log "Error: API failed to become healthy after ${MAX_ATTEMPTS} attempts"
-            sudo docker compose logs node-app
+            docker compose logs node-app
             exit 1
           fi
 
           # Clean up old images
           log "Cleaning up old Docker images..."
-          sudo docker image prune -f
+          docker image prune -f
 
           log "Deployment completed successfully!"
           EOL
