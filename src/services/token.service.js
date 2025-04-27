@@ -53,4 +53,14 @@ const generateAuthTokens = async (user) => {
   };
 };
 
-module.exports = { generateToken, saveToken, verifyToken, generateAuthTokens };
+/**
+ * Delete a refresh token for a user during logout
+ * @param {string} refreshToken - The refresh token to delete
+ * @returns {Promise<boolean>} - True if successful
+ */
+const deleteRefreshToken = async (refreshToken) => {
+  const result = await Token.findOneAndDelete({ token: refreshToken, type: tokenTypes.REFRESH });
+  return !!result;
+};
+
+module.exports = { generateToken, saveToken, verifyToken, generateAuthTokens, deleteRefreshToken };

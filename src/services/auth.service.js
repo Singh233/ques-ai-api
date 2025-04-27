@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const { User, Token } = require('../models/index.js');
-const { tokenService } = require('../services/index.js');
+const tokenService = require('./token.service.js'); // Direct import to avoid circular dependency
 const { tokenTypes } = require('../config/tokens.js');
 
 const generateToken = () => {
@@ -18,7 +18,20 @@ const refreshAuth = async (refreshToken) => {
   return tokenService.generateAuthTokens(user);
 };
 
+/**
+ * Logout user by removing refresh token
+ * @param {string} refreshToken
+ * @returns {Promise<boolean>}
+ */
+const logout = async (refreshToken) => {
+  if (!refreshToken) {
+    return false;
+  }
+  return tokenService.deleteRefreshToken(refreshToken);
+};
+
 module.exports = {
   generateToken,
   refreshAuth,
+  logout,
 };

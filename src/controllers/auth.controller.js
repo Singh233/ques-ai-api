@@ -18,4 +18,27 @@ const refreshTokens = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).json({ ...tokens });
 });
 
-module.exports = { checkAdmin, refreshTokens };
+/**
+ * Logout user by invalidating refresh token
+ */
+const logout = catchAsync(async (req, res) => {
+  const refreshToken = req.cookies?.refreshToken || req.body.refreshToken || req.headers['x-refresh-token'];
+
+  if (!refreshToken) {
+    return res.status(httpStatus.BAD_REQUEST).json({ message: 'Refresh token is required' });
+  }
+
+  await authService.logout(refreshToken);
+
+  // Clear cookies if they exist
+  if (req.cookies?.accessToken) {
+    res.clearCookie('accessToken');
+  }
+  if (req.cookies?.refreshToken) {
+    res.clearCookie('refreshToken');
+  }
+
+  return res.status(httpStatus.OK).json({ message: 'Logged out successfully' });
+});
+
+module.exports = { checkAdmin, refreshTokens, logout };
