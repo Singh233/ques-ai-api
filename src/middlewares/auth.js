@@ -23,12 +23,35 @@ const extractToken = (req) => {
   if (authHeader && authHeader.startsWith('Bearer ')) {
     return authHeader.substring(7);
   }
+
+  const cookies = req.headers.cookie;
+  if (cookies) {
+    const cookieArray = cookies.split('; ');
+    for (const cookie of cookieArray) {
+      const [name, value] = cookie.split('=');
+      if (name === 'accessToken') {
+        return decodeURIComponent(value);
+      }
+    }
+  }
+
   return null;
 };
 
 const extractRefreshToken = (req) => {
   const refreshToken = req.cookies?.refreshToken;
   if (refreshToken) return refreshToken;
+
+  const cookies = req.headers.cookie;
+  if (cookies) {
+    const cookieArray = cookies.split('; ');
+    for (const cookie of cookieArray) {
+      const [name, value] = cookie.split('=');
+      if (name === 'refreshToken') {
+        return decodeURIComponent(value);
+      }
+    }
+  }
 
   return req.headers['x-refresh-token'];
 };
@@ -64,6 +87,8 @@ const auth = () => async (req, res, next) => {
         next(err);
       });
   }
+
+  req.headers.authorization = `Bearer ${accessToken}`;
 
   try {
     if (isTokenExpiredOrCloseToExpiry(accessToken)) {
@@ -105,6 +130,7 @@ const auth = () => async (req, res, next) => {
         // Add the newly refreshed token to the request for authentication
         req.headers.authorization = `Bearer ${tokens.access.token}`;
       } catch (refreshError) {
+        console.log(refreshError);
         logger.error(`Token refresh failed: ${JSON.stringify(refreshError)}`);
         throw new ApiError(httpStatus.UNAUTHORIZED, 'Failed to refresh authentication token');
       }

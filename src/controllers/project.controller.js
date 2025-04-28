@@ -20,4 +20,9 @@ const getProject = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).json({ message: 'Project retrieved successfully', project });
 });
 
-module.exports = { createProject, getProjects, getProject };
+const getProjectByName = catchAsync(async (req, res) => {
+  const project = await projectService.getProjectByName(req.params.name, req.user.id);
+  res.status(httpStatus.OK).json({ message: 'Project retrieved successfully', project });
+});
+
+module.exports = { createProject, getProjects, getProject, getProjectByName };

@@ -17,6 +17,12 @@ const getProject = {
   }),
 };
 
+const getProjectByName = {
+  params: Joi.object().keys({
+    name: Joi.string().required(),
+  }),
+};
+
 const createProject = {
   body: Joi.object().keys({
     user: Joi.string().custom(objectId).required(),
@@ -28,5 +34,6 @@ const createProject = {
 module.exports = {
   getProjects,
   getProject,
+  getProjectByName,
   createProject,
 };
