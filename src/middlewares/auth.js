@@ -130,6 +130,7 @@ const auth = () => async (req, res, next) => {
         // Add the newly refreshed token to the request for authentication
         req.headers.authorization = `Bearer ${tokens.access.token}`;
       } catch (refreshError) {
+        console.log(refreshError);
         logger.error(`Token refresh failed: ${JSON.stringify(refreshError)}`);
         throw new ApiError(httpStatus.UNAUTHORIZED, 'Failed to refresh authentication token');
       }

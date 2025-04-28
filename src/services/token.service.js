@@ -25,7 +25,9 @@ const saveToken = async (token, userId, expires, type) => {
 };
 
 const verifyToken = async (token, type) => {
+  console.log('Verifying token:', token, type);
   const payload = jwt.verify(token, config.jwt.secret);
+  console.log(payload.sub)
   const tokenDoc = await Token.findOne({ token, type, user: payload.sub });
   if (!tokenDoc) {
     throw new Error('Token not found or expired');
