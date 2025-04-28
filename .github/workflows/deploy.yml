@@ -59,15 +59,17 @@ jobs:
           git reset --hard origin/main
           npm install
 
-          # Check for running containers
+          # Check if the node-app container is running and stop only that service
           if docker compose ps | grep -q "node-app"; then
-            log "Stopping existing containers..."
-            docker compose down
+            log "Stopping node-app service..."
+            docker compose stop node-app
+            docker compose rm -f node-app
           fi
 
-          # Start the containers with --build flag
-          log "Starting containers..."
-          docker compose -f docker-compose.prod.yml up -d
+          # Rebuild and start only the node-app service
+          log "Building and starting node-app service..."
+          docker compose -f docker-compose.prod.yml build node-app
+          docker compose -f docker-compose.prod.yml up -d node-app
 
           # Wait for the API to become healthy
           log "Waiting for API to become healthy..."
