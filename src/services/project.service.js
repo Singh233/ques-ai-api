@@ -51,8 +51,28 @@ const getProject = async (id) => {
   return project;
 };
 
+/**
+ * Get project by name
+ * @param {string} name - Project name (formatted as slug)
+ * @param {ObjectId} userId - User ID
+ * @returns {Promise<Project>}
+ */
+const getProjectByName = async (name, userId) => {
+  const formattedName = name.split('-').join(' ');
+  const project = await Project.findOne({
+    name: new RegExp(`^${formattedName}$`, 'i'),
+    user: userId,
+  });
+
+  if (!project) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
+  }
+  return project;
+};
+
 module.exports = {
   createProject,
   queryProjects,
   getProject,
+  getProjectByName,
 };
