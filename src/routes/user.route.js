@@ -9,7 +9,7 @@ const auth = require('../middlewares/auth.js');
 
 const router = express.Router();
 
-const { getAll, update, search, softDelete, permanentDelete } = generateCrud(User, {
+const { getAll, update, search, softDelete } = generateCrud(User, {
   name: 'User',
   searchableFields: 'name',
   populate: 'email',
@@ -19,10 +19,9 @@ const { getAll, update, search, softDelete, permanentDelete } = generateCrud(Use
 router.get('/', cache('user'), validate(userValidation.getUsers), getAll);
 router.get('/search/:searchQuery', cache('user'), validate(userValidation.searchUsers), search);
 
-router.put('/change-role', cache('user'), validate(userValidation.changeType), userController.changeType);
-router.put('/:id', cache('user'), validate(userValidation.updateUser), update);
-router.delete('/:id', cache('user'), validate(userValidation.deleteUser), softDelete);
-router.delete('/remove/:id', cache('user'), validate(userValidation.deleteUser), permanentDelete);
+router.put('/change-role', auth(), validate(userValidation.changeType), userController.changeType);
+router.put('/:id', auth(), validate(userValidation.updateUser), update);
+router.delete('/:id', auth(), validate(userValidation.deleteUser), softDelete);
 
 // Sign up route
 router.post('/sign-up', validate(userValidation.signUpUser), userController.signUpUser);
