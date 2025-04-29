@@ -5,12 +5,15 @@ const { fileService, projectService } = require('../services/index.js');
 
 const createFile = catchAsync(async (req, res) => {
   const file = await fileService.createFile(req.body);
+  const project = await projectService.getProject(req.body.project);
 
   // Update project metadata to reflect new file
-  const project = await projectService.getProject(req.body.project);
-  project.metaData.fileCount = (project.metaData.fileCount || 0) + 1;
-  project.metaData.lastEdited = new Date();
-  await project.save();
+  await projectService.updateProject(req.body.project, {
+    metaData: {
+      fileCount: (project.metaData?.fileCount || 0) + 1,
+      lastEdited: new Date(),
+    },
+  });
 
   res.status(httpStatus.CREATED).json({ message: 'File created successfully', file });
 });
@@ -31,21 +34,26 @@ const updateFile = catchAsync(async (req, res) => {
   const file = await fileService.updateFile(req.params.id, req.body);
 
   // Update project metadata to reflect file edit
-  const project = await projectService.getProject(file.project);
-  project.metaData.lastEdited = new Date();
-  await project.save();
+  await projectService.updateProject(file.project, {
+    metaData: {
+      lastEdited: new Date(),
+    },
+  });
 
   res.status(httpStatus.OK).json({ message: 'File updated successfully', file });
 });
 
 const deleteFile = catchAsync(async (req, res) => {
   const file = await fileService.deleteFile(req.params.id);
+  const project = await projectService.getProject(file.project);
 
   // Update project metadata to reflect file deletion
-  const project = await projectService.getProject(file.project);
-  project.metaData.fileCount = Math.max(0, (project.metaData.fileCount || 1) - 1);
-  project.metaData.lastEdited = new Date();
-  await project.save();
+  await projectService.updateProject(file.project, {
+    metaData: {
+      fileCount: Math.max(0, (project.metaData?.fileCount || 1) - 1),
+      lastEdited: new Date(),
+    },
+  });
 
   res.status(httpStatus.OK).json({ message: 'File deleted successfully', file });
 });
