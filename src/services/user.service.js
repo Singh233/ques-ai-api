@@ -68,6 +68,9 @@ const signUpUser = async (userData) => {
     throw new ApiError(500, 'Error saving user');
   }
 
+  // Populate the email field in the saved user object
+  await savedUser.populate('email');
+
   // Remove password from the saved user object before returning
   savedUser.password = undefined;
 
@@ -82,7 +85,7 @@ const signInUser = async (email, password) => {
   }
 
   // Find the user associated with the email
-  const user = await User.findOne({ email: emailDoc._id }).select('+password');
+  const user = await User.findOne({ email: emailDoc._id }).select('+password').populate('email');
   if (!user) {
     throw new ApiError(401, 'Invalid email or password');
   }
