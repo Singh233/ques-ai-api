@@ -94,12 +94,14 @@ const auth = () => async (req, res, next) => {
             secure: config.env === 'production',
             sameSite: 'strict',
             maxAge: config.jwt.accessExpirationMinutes * 60 * 1000,
+            domain: config.env === 'production' ? '.chillsanam.com' : undefined,
           });
 
           res.cookie('refreshToken', tokens.refresh.token, {
             secure: config.env === 'production',
             sameSite: 'strict',
             maxAge: config.jwt.refreshExpirationDays * 24 * 60 * 60 * 1000,
+            domain: config.env === 'production' ? '.chillsanam.com' : undefined,
           });
         }
 

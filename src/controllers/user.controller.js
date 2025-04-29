@@ -15,15 +15,17 @@ const signUpUser = catchAsync(async (req, res) => {
   const user = await userService.signUpUser(userData);
   const tokens = await generateAuthTokens(user);
   res.cookie('accessToken', tokens.access.token, {
-    secure: config.env === 'production' && req.secure,
+    secure: config.env === 'production',
     sameSite: 'strict',
     maxAge: config.jwt.accessExpirationMinutes * 60 * 1000,
+    domain: config.env === 'production' ? '.chillsanam.com' : undefined,
   });
 
   res.cookie('refreshToken', tokens.refresh.token, {
     secure: config.env === 'production',
     sameSite: 'strict',
     maxAge: config.jwt.refreshExpirationDays * 24 * 60 * 60 * 1000,
+    domain: config.env === 'production' ? '.chillsanam.com' : undefined,
   });
   return res.status(httpStatus.CREATED).json({ message: 'User created successfully', user, tokens });
 });
@@ -33,15 +35,17 @@ const signInUser = catchAsync(async (req, res) => {
   const user = await userService.signInUser(email, password);
   const tokens = await generateAuthTokens(user);
   res.cookie('accessToken', tokens.access.token, {
-    secure: config.env === 'production' && req.secure,
+    secure: config.env === 'production',
     sameSite: 'strict',
     maxAge: config.jwt.accessExpirationMinutes * 60 * 1000,
+    domain: config.env === 'production' ? '.chillsanam.com' : undefined,
   });
 
   res.cookie('refreshToken', tokens.refresh.token, {
     secure: config.env === 'production',
     sameSite: 'strict',
     maxAge: config.jwt.refreshExpirationDays * 24 * 60 * 60 * 1000,
+    domain: config.env === 'production' ? '.chillsanam.com' : undefined,
   });
   return res.status(httpStatus.OK).json({ message: 'User signed in successfully', user, tokens });
 });
