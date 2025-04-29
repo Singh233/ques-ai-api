@@ -1,7 +1,7 @@
 const passport = require('passport');
 const httpStatus = require('http-status');
 const moment = require('moment');
-
+const { extractRefreshToken } = require('../utils/helper.js');
 const ApiError = require('../utils/ApiError.js');
 const jwt = require('jsonwebtoken');
 const config = require('../config/config.js');
@@ -36,24 +36,6 @@ const extractToken = (req) => {
   }
 
   return null;
-};
-
-const extractRefreshToken = (req) => {
-  const refreshToken = req.cookies?.refreshToken;
-  if (refreshToken) return refreshToken;
-
-  const cookies = req.headers.cookie;
-  if (cookies) {
-    const cookieArray = cookies.split('; ');
-    for (const cookie of cookieArray) {
-      const [name, value] = cookie.split('=');
-      if (name === 'refreshToken') {
-        return decodeURIComponent(value);
-      }
-    }
-  }
-
-  return req.headers['x-refresh-token'];
 };
 
 const isTokenExpiredOrCloseToExpiry = (token) => {
@@ -101,10 +83,6 @@ const auth = () => async (req, res, next) => {
       try {
         const tokens = await authService.refreshAuth(refreshToken);
 
-        // Set new tokens in response headers
-        res.set('Access-Token', tokens.access.token);
-        res.set('Refresh-Token', tokens.refresh.token);
-
         const accessTokenExpires = moment().add(config.jwt.accessExpirationMinutes, 'minutes');
         const refreshTokenExpires = moment().add(config.jwt.refreshExpirationDays, 'days');
 
@@ -113,14 +91,12 @@ const auth = () => async (req, res, next) => {
 
         if (req.cookies?.refreshToken) {
           res.cookie('accessToken', tokens.access.token, {
-            httpOnly: true,
             secure: config.env === 'production',
             sameSite: 'strict',
             maxAge: config.jwt.accessExpirationMinutes * 60 * 1000,
           });
 
           res.cookie('refreshToken', tokens.refresh.token, {
-            httpOnly: true,
             secure: config.env === 'production',
             sameSite: 'strict',
             maxAge: config.jwt.refreshExpirationDays * 24 * 60 * 60 * 1000,
@@ -130,7 +106,6 @@ const auth = () => async (req, res, next) => {
         // Add the newly refreshed token to the request for authentication
         req.headers.authorization = `Bearer ${tokens.access.token}`;
       } catch (refreshError) {
-        console.log(refreshError);
         logger.error(`Token refresh failed: ${JSON.stringify(refreshError)}`);
         throw new ApiError(httpStatus.UNAUTHORIZED, 'Failed to refresh authentication token');
       }

@@ -17,7 +17,6 @@ const parseQueryParams = async (query) => {
     const [key, value] = entry;
     if (typeof value == 'string') {
       if (value == 'true') {
-
         parsedQuery[key] = true;
       } else if (value == 'false') {
         parsedQuery[key] = false;
@@ -36,7 +35,6 @@ const parseQueryParams = async (query) => {
   }
   return { ...query, ...parsedQuery };
 };
-
 
 const extractIPAndUserAgent = async (req) => {
   let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -58,10 +56,28 @@ const parseCookies = async (cookies) => {
   return cookieObj;
 };
 
+const extractRefreshToken = (req) => {
+  const refreshToken = req.cookies?.refreshToken;
+  if (refreshToken) return refreshToken;
+
+  const cookies = req.headers.cookie;
+  if (cookies) {
+    const cookieArray = cookies.split('; ');
+    for (const cookie of cookieArray) {
+      const [name, value] = cookie.split('=');
+      if (name === 'refreshToken') {
+        return decodeURIComponent(value);
+      }
+    }
+  }
+
+  return req.headers['x-refresh-token'];
+};
 
 module.exports = {
   parseQueryParams,
   extractIPAndUserAgent,
   parseError,
   parseCookies,
+  extractRefreshToken,
 };

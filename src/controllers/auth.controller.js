@@ -1,6 +1,7 @@
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync.js');
 const ApiError = require('../utils/ApiError.js');
+const { extractRefreshToken } = require('../utils/helper.js');
 const { Types } = require('../config/accessControl.js');
 const { authService, userService } = require('../services/index.js');
 
@@ -22,7 +23,7 @@ const refreshTokens = catchAsync(async (req, res) => {
  * Logout user by invalidating refresh token
  */
 const logout = catchAsync(async (req, res) => {
-  const refreshToken = req.cookies?.refreshToken || req.body.refreshToken || req.headers['x-refresh-token'];
+  const refreshToken = extractRefreshToken(req);
 
   if (!refreshToken) {
     return res.status(httpStatus.BAD_REQUEST).json({ message: 'Refresh token is required' });
